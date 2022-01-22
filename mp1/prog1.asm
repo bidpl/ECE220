@@ -104,6 +104,78 @@ PRINT_HIST
 ; for your implementation, list registers used in this part of the code,
 ; and provide sufficient comments
 
+; Registers
+;	R0: Printing 
+;	R1: Loop count
+;	R2: Additive inverse of number of bins
+;	R3: Loop counter for bin to hex printing
+;	R4: Loop counter for transfer 4MSB of data to R0
+;	R5: Histogram entry for character
+;	R6: Temp Register
+
+	; LD	R0, STR_START	; Printout the string  --THIS HEADER NOT USED FOR ACTUAL FORMAT--
+	; PUTS
+
+	; AND	R0, R0, #0	; Clear R0
+	; ADD	R0, R0, x0A	; LD ascii code for newline
+	; OUT			; Print 2 newline characters
+	; OUT			--END OF UNUSED HEADER--
+
+	AND	R1, R1, #0	; Set Loop count to 0
+	LD	R2, NUM_BINS	; Set R2 to additive inverse of number of bins
+	NOT	R2, R2
+	ADD	R2, R2, #1
+
+BINLOOP ; Print label for line
+	LD	R0, ASCII_AT	; Load @ character into R0
+	ADD	R0, R0, R1	; Add loop counter to make it into current character
+	OUT			; Print it
+	LD	R0, ASCII_SP	; Load space character into R0
+	OUT			; Print it
+
+	; Get count, convert to ascii hex and print
+	LD	R6, HIST_ADDR	; Load starting address of histogram into R6
+	ADD	R6, R6, R1	; Add loop counter to get addr of correct row in histogram
+	LDR	R5, R6, #0	; Load number of occurences into R6
+
+	AND	R3, R3, #0	; Clear R3
+	ADD	R3, R3, #4	; Set R3 to 4 (for 4 digits)
+
+BITLOOP	AND	R4, R4, #0	; Clear R4
+	ADD	R4, R4, #4	; Set R4 to 4 (4 bits per hex digit)
+	AND	R0, R0, #0	; Clear R0
+
+DIGLOOP	; This loop transfers 4 MSB from data to R0 to be printed
+	ADD	R0, R0, R0	; Leftshift R0
+	ADD	R5, R5, #0	; Update CC bits with number of occurences data
+	BRzp	NO_ADD		; if MSB of data 0, keep LSB of R0 0
+	ADD	R0, R0, #1	; Set last bit of R0 to 1
+NO_ADD	ADD	R5, R5, R5	; Leftshift data
+	ADD	R4, R4, #-1	; Decrement bit loop
+	BRp	DIGLOOP		; Loop 4 times
+
+	ADD	R0, R0, #-10	; Test of number or letter digit
+	BRzp	LETTER
+
+	LD	R6, OFFSET_0	; Load ascii offset for number
+	BR	PRINTCH
+
+LETTER	LD	R6, OFFSET_A	; Load ascii offset for letter
+
+PRINTCH	ADD	R0, R0, R6	; Add offset to turn R0 into ascii for correct hex digit
+	OUT			; Print it
+
+	ADD	R3, R3, #-1	; Decrement hex digit loop
+	BRp	BITLOOP		; Loop 4 times
+	
+	; End of line code
+	AND	R0, R0, #0	;Print newline
+	ADD	R0, R0, x0A
+	OUT
+	ADD	R3, R3, #1	; Store next ascii character
+	ADD	R1, R1, #1	; Increment loop counter
+	ADD	R6, R1, R2	; Check if loop count is still < number of bins
+	BRn	BINLOOP		; Next line if haven't printed number of bins lines
 
 
 DONE	HALT			; done
@@ -115,7 +187,12 @@ NEG_AT		.FILL xFFC0	; the additive inverse of ASCII '@'
 AT_MIN_Z	.FILL xFFE6	; the difference between ASCII '@' and 'Z'
 AT_MIN_BQ	.FILL xFFE0	; the difference between ASCII '@' and '`'
 HIST_ADDR	.FILL x3F00     ; histogram starting address
+ASCII_AT	.FILL x0040	;+Ascii value for @
+ASCII_SP	.FILL x0020	;+Ascii value for space
+OFFSET_0	.FILL x003a	;+Ascii value for 0 + 10
+OFFSET_A	.FILL x0041	;+Ascii value for A
 STR_START	.FILL x4000	; string starting address
+
 
 ; for testing, you can use the lines below to include the string in this
 ; program...

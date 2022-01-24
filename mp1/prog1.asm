@@ -1,4 +1,14 @@
-;
+; Count Character Frequency in String
+; Binh-Minh Nguyen (bmn4)
+; UIUC ECE220 MP1 1/24/2022
+
+; Takes a null-terminated string starting at M[x4000]
+; Prints out a histogram of character occurences, quantities listed in hex
+
+; Code that counts characters in the string is given as starter code, I only wrote the part that prints out the histogram.
+
+; ----------------
+
 ; The code given to you here implements the histogram calculation that 
 ; we developed in class.  In programming lab, we will add code that
 ; prints a number in hexadecimal to the monitor.

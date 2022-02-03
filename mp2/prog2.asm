@@ -18,7 +18,7 @@
 	
 ;your code goes here
 	
-START	IN
+START	GETC
 	JSR	EVALUATE
 	BRzp	START
 	HALT

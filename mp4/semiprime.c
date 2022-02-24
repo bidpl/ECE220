@@ -1,5 +1,5 @@
 /* Semiprime generator - UIUC ECE220 MP4 2/18/2022
- * "debugged" by Binh-Minh Nguyen (bmn4) for mp4
+ * "debugged" (just fixed the errors) by Binh-Minh Nguyen (bmn4) for mp4
  * Takes two numbers  from terminal, prints out semiprime numbers between them.
  * 
  * Fixes:
@@ -12,6 +12,8 @@
  *  - Without this som numbers would print twice e.g. 6 prints twice since it's 2x3 and 3x2
  * print_semiprimes: set ret = 1 when a number is printed (when a semi-prime is detected)
  *  - It was always returning 0 without this line.
+ * 
+ * End intro paragraph
  */
 
 #include <stdlib.h>

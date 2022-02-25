@@ -1,6 +1,9 @@
 *.obj
 *.sym
 
+mp3/mp3
+mp4/mp4
+
 .vscode
 
 scratchSpace

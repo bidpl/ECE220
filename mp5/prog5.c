@@ -62,8 +62,20 @@ set_seed (const char seed_str[])
 //    Check that the return value is 1 to ensure the user enters only an integer. 
 //    Feel free to uncomment these statements, modify them, or delete these comments as necessary. 
 //    You may need to change the return statement below
+
+    int seed;
+    char post[255];
+
+    int numRead = sscanf(seed_str, "%d%1s", &seed, post);
+
+    if(numRead != 1) {
+        printf("set_seed: invalid seed\n");
+        return 0;
+    }
+
+    srand(seed);
    
-    return 0;
+    return 1;
 }
 
 
@@ -86,7 +98,18 @@ void
 start_game (int* one, int* two, int* three, int* four)
 {
     //your code here
-    
+    // Generatre random value between [1,8], store into variable. Do this 4 times
+    *one = rand() % 8 + 1;
+    *two = rand() % 8 + 1;
+    *three = rand() % 8 + 1;
+    *four = rand() % 8 + 1;
+
+    guess_number = 1;
+
+    solution1 = *one;
+    solution2 = *two;
+    solution3 = *three;
+    solution4 = *four;
 }
 
 /*

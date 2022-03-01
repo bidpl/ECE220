@@ -2,6 +2,7 @@
  * I implemented a for functions to get the codebreaker game to work.
  * I stayed with the instructions for the most part, except for in make_guess.
  * I put all the guess information into arrays to make it easier to work with (solutions are combined into an array, so are the guesses and paired booleans)
+ * Had to resubmit since messed up to misplaced match code (idk what I was thinking with old code). Would not count misplaced match if the solution came after the guess's location.
  */
 
 
@@ -155,8 +156,9 @@ make_guess (const char guess_str[], int* one, int* two,
     int misplacedMatch = 0;
     int perfectMatch = 0;
 
-    // Stores if solution has been paired
-    char paired[] = {0,0,0,0};
+    // Stores if solution/guess has been paired
+    char pairedSol[] = {0,0,0,0};
+    char pairedGuess[] = {0,0,0,0};
 
     int *guesses[] = {one, two, three, four};
 
@@ -169,18 +171,26 @@ make_guess (const char guess_str[], int* one, int* two,
         return 0;
     }
 
-    //For each guess
+    //Check for exact matches
     for(int i = 0; i < 4; i++) {
         if(*guesses[i] == solutions[i]) {
             //If exact match
             perfectMatch++;
-            paired[i] = 1;
-        } else {
-            for(int j = 0; j < i; j ++) {
-                if(!paired[j] && *guesses[i] == solutions[j]) {
-                    //If misplaced match with unpaired solution
+            pairedSol[i] = 1;
+            pairedGuess[i] = 1;
+        }
+    }
+
+    //Check for misplaced matches (iterate through guesses)
+    for(int i = 0; i < 4; i++) {
+        //Only check if guess hasn't been paired
+        if(!pairedGuess[i]) {
+            for(int j = 0; j < 4; j ++) {
+                // Find first unpaired solution that matches
+                if(!pairedSol[j] && *guesses[i] == solutions[j]) {
                     misplacedMatch++;
-                    paired[j] = 1;
+                    pairedSol[j] = 1;
+                    break;
                 }
             }
         }

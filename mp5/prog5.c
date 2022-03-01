@@ -1,7 +1,7 @@
-/*			
- *
- * prog5.c - source file adapted from UIUC ECE198KL Spring 2013 Program 4
- *           student code -- GOLD VERSION by Steven S. Lumetta
+/* ECE220 MP5 Codebreaker - UIUC SP2022 (bmn4)
+ * I implemented a for functions to get the codebreaker game to work.
+ * I stayed with the instructions for the most part, except for in make_guess.
+ * I put all the guess information into arrays to make it easier to work with (solutions are combined into an array, so are the guesses and paired booleans)
  */
 
 

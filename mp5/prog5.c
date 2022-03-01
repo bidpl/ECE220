@@ -149,6 +149,46 @@ make_guess (const char guess_str[], int* one, int* two,
 //  You should then check if the 4 integers are between 1-8. If so, it is a valid guess
 //  Otherwise, it is invalid.  
 //  Feel free to use this sscanf statement, delete these comments, and modify the return statement as needed
+
+    char post[255];
+
+    int misplacedMatch = 0;
+    int perfectMatch = 0;
+
+    // Stores if solution has been paired
+    char paired[] = {0,0,0,0};
+
+    int *guesses[] = {one, two, three, four};
+
+    int solutions[] = {solution1, solution2, solution3, solution4};
+
+    int numRead = sscanf(guess_str, "%d%d%d%d%1s", guesses[0], guesses[1], guesses[2], guesses[3], post);
+    
+    if(numRead != 4) {
+        printf("make_guess: invalid guess\n");
+        return 0;
+    }
+
+    //For each guess
+    for(int i = 0; i < 4; i++) {
+        if(*guesses[i] == solutions[i]) {
+            //If exact match
+            perfectMatch++;
+            paired[i] = 1;
+        } else {
+            for(int j = 0; j < i; j ++) {
+                if(!paired[j] && *guesses[i] == solutions[j]) {
+                    //If misplaced match with unpaired solution
+                    misplacedMatch++;
+                    paired[j] = 1;
+                }
+            }
+        }
+    }
+
+    printf("With guess %d, you got %d perfect matches and %d misplaced matches.\n", guess_number, perfectMatch, misplacedMatch);
+
+    guess_number++;
     return 1;
 }
 

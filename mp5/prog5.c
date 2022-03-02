@@ -166,7 +166,16 @@ make_guess (const char guess_str[], int* one, int* two,
 
     int numRead = sscanf(guess_str, "%d%d%d%d%1s", guesses[0], guesses[1], guesses[2], guesses[3], post);
     
-    if(numRead != 4) {
+    char validNums = 1;
+
+    for(int i = 0; i < 4; i++) {
+        if(*guesses[i] < 1 || *guesses[i] > 8) {
+            validNums = 0;
+            break;
+        }
+    }
+
+    if(numRead != 4 || !validNums) {
         printf("make_guess: invalid guess\n");
         return 0;
     }

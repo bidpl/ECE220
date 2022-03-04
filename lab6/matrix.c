@@ -9,5 +9,16 @@
 void matrix_multiply(double *matrixA,double *matrixB,double *matrixC,int m,int k,int n)
 {
 //YOUR CODE HERE
+    for(int rowC = 0; rowC < m; rowC++) {
+        for(int colC = 0; colC<n; colC++) {
+            double sum = 0;
+
+            for(int i = 0; i < k; i++) {
+                sum += matrixA[rowC*k + i] * matrixB[i*n + colC];
+            }
+
+            matrixC[rowC*n + colC] = sum;
+        }
+    }
 }
 

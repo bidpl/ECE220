@@ -5,6 +5,9 @@
  * and created a helper function get_next_cell that gets the next empty cell
  * or returns 0 if board is solved.
  * I also implemented solve_sudoku using the flowchart in lab/class
+ * 
+ * Compiling with -Werror yields 2 incompatible pointer types (method wants const int array, we feed it in array)
+ * I can't do anything without changing the given code so I'll leave it be
  */
 
 //-------------------------------------------------------------------------------------------------
@@ -97,7 +100,7 @@ int is_val_valid(const int val, const int i, const int j, const int sudoku[9][9]
 // Function: get_next_cell
 // Return true if there is an empty cell
 // Stores coordinates of first empty cell in *empty_cell_row and *empty_cell_col
-int get_next_cell(int *empty_cell_row, int *empty_cell_col, const int sudoku[9][9]) {
+int get_next_cell(int *empty_cell_row, int *empty_cell_col, int sudoku[9][9]) {
   // Loop through sudoku grid, checking if each cell is empty
   for(int i = 0; i < 9; i++) {
     for(int j = 0; j < 9; j++) {

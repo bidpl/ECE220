@@ -1,6 +1,9 @@
 #include "game.h"
 
-
+/* 2048 - MP8 ECE220 SP22 bmn4
+ * I filled out the make_game, remake_game, destroy_game, get_cell, the 4 move functions, and the legal_move_check fuctions
+ * for remake_game, I used destroy_game and make_game instead of copying parts of make_game like the instructions suggest
+ */
 game * make_game(int rows, int cols)
 /*! Create an instance of a game structure with the given number of rows
     and columns, initializing elements to -1 and return a pointer
@@ -15,6 +18,16 @@ game * make_game(int rows, int cols)
 
     //YOUR CODE STARTS HERE:  Initialize all other variables in game struct
 
+    mygame->rows = rows;
+    mygame->cols = cols;
+    mygame->score = 0;
+
+    // Set every cell to -1
+    for(int i = 0; i < rows; i++) {
+        for(int j = 0; j < cols; j++) {
+            (mygame->cells)[i * (cols) + j] = -1;
+        }
+    }
 
     return mygame;
 }
@@ -32,6 +45,23 @@ void remake_game(game ** _cur_game_ptr,int new_rows,int new_cols)
 	(*_cur_game_ptr)->cells = malloc(new_rows*new_cols*sizeof(cell));
 
 	 //YOUR CODE STARTS HERE:  Re-initialize all other variables in game struct
+
+    // I think this is redundant
+    // // Reinit # of rows + cols & reset score
+    //  (*_cur_game_ptr)->rows = new_rows;
+    //  (*_cur_game_ptr)->cols = new_cols;
+    //  (*_cur_game_ptr)->score = 0;
+
+    // // Set every cell to -1
+    // for(int i = 0; i < new_rows; i++) {
+    //     for(int j = 0; j < new_cols; j++) {
+    //         ((*_cur_game_ptr)->cells)[i * (new_cols) + j] = -1;
+    //     }
+    // }
+
+    // Would this work?
+    destroy_game(*_cur_game_ptr);
+    *_cur_game_ptr = make_game(new_rows, new_cols);
 
 	return;	
 }
@@ -54,7 +84,10 @@ cell * get_cell(game * cur_game, int row, int col)
 */
 {
     //YOUR CODE STARTS HERE
-
+    if (row >= 0 && row < cur_game->rows && col >= 0 && col < cur_game->cols) {
+        return &(cur_game->cells)[row * (cur_game->cols) + col];
+    }
+    
     return NULL;
 }
 
@@ -67,28 +100,231 @@ int move_w(game * cur_game)
 */
 {
     //YOUR CODE STARTS HERE
+    int changeApplied = 0;
 
-    return 1;
+    // In each col
+    for(int n = 0; n < cur_game->cols; n++) {
+        // Check each row
+        int alreadyMerged = 0; // Shows if "top of stack" (most recent item) was a merge
+        int lastIndex = -1; // Top of stack index (index of most recent item)
+        for(int m = 0; m < cur_game->rows; m++) {
+            // If cell is not empty
+            if(cur_game->cells[m*cur_game->cols + n] != -1) {
+                // Find first empty/mergable cell above it (if it exists)
+                for(int i = 0; i < m; i++) {
+                    // If it is empty, move the number into that spot
+                    if(cur_game->cells[i*cur_game->cols + n] == -1) {
+                        cur_game->cells[i*cur_game->cols + n] = cur_game->cells[m*cur_game->cols + n];
+                        cur_game->cells[m*cur_game->cols + n] = -1;
+
+                        alreadyMerged = 0;
+                        lastIndex = i;
+
+                        changeApplied = 1;
+                        break;
+                    }
+
+                    // If it is the same value, hasn't been merged, and was the last item moved (only empty spaces between them), merge into spot
+                    if((cur_game->cells[i*cur_game->cols + n] == cur_game->cells[m*cur_game->cols + n]) && lastIndex == i && (alreadyMerged == 0)) {
+                        cur_game->cells[i*cur_game->cols + n] *= 2;
+                        cur_game->cells[m*cur_game->cols + n] = -1;
+
+                        cur_game->score += cur_game->cells[i*cur_game->cols + n];
+
+                        alreadyMerged = 1;
+                        lastIndex = i;
+
+                        changeApplied = 1;
+                        break;
+                    }
+                }
+
+                // If cell didn't move
+                if(cur_game->cells[m*cur_game->cols + n] != -1) {
+                    lastIndex = m;
+                }
+            }
+        }
+    }
+
+    if(changeApplied) {
+        return 1;
+    } else {
+        return 0;
+    }
 };
 
 int move_s(game * cur_game) //slide down
 {
     //YOUR CODE STARTS HERE
+    int changeApplied = 0;
 
-    return 1;
+    // In each col
+    for(int n = 0; n < cur_game->cols; n++) {
+        // Check each row
+        int alreadyMerged = 0; // Shows if "top of stack" (most recent item) was a merge
+        int lastIndex = -1; // Top of stack index (index of most recent item)
+        for(int m = cur_game->rows - 1; m >= 0; m--) {
+            // If cell is not empty
+            if(cur_game->cells[m*cur_game->cols + n] != -1) {
+                // Find first empty/mergable cell below it (if it exists)
+                for(int i = cur_game->rows - 1; i >= m; i--) {
+                    // If it is empty, move the number into that spot
+                    if(cur_game->cells[i*cur_game->cols + n] == -1) {
+                        cur_game->cells[i*cur_game->cols + n] = cur_game->cells[m*cur_game->cols + n];
+                        cur_game->cells[m*cur_game->cols + n] = -1;
+
+                        alreadyMerged = 0;
+                        lastIndex = i;
+
+                        changeApplied = 1;
+                        break;
+                    }
+
+                    // If it is the same value, hasn't been merged, and was the last item moved (only empty spaces between them), merge into spot
+                    if((cur_game->cells[i*cur_game->cols + n] == cur_game->cells[m*cur_game->cols + n]) && lastIndex == i && (alreadyMerged == 0)) {
+                        cur_game->cells[i*cur_game->cols + n] *= 2;
+                        cur_game->cells[m*cur_game->cols + n] = -1;
+
+                        cur_game->score += cur_game->cells[i*cur_game->cols + n];
+
+                        alreadyMerged = 1;
+                        lastIndex = i;
+
+                        changeApplied = 1;
+                        break;
+                    }
+                }
+
+                // If cell didn't move
+                if(cur_game->cells[m*cur_game->cols + n] != -1) {
+                    lastIndex = m;
+                }
+            }
+        }
+    }
+
+    if(changeApplied) {
+        return 1;
+    } else {
+        return 0;
+    }
 };
 
 int move_a(game * cur_game) //slide left
 {
     //YOUR CODE STARTS HERE
+    int changeApplied = 0;
 
-    return 1;
+    // In each row
+    for(int m = 0; m < cur_game->rows; m++){
+        // Check each col
+        int alreadyMerged = 0; // Shows if "top of stack" (most recent item) was a merge
+        int lastIndex = -1; // Top of stack index (index of most recent item)
+
+        for(int n = 0; n < cur_game->cols; n++) {
+            // If cell is not empty
+            if(cur_game->cells[m*cur_game->cols + n] != -1) {
+                // Find first empty/mergable cell above it (if it exists)
+                for(int i = 0; i < n; i++) {
+                    // If it is empty, move the number into that spot
+                    if(cur_game->cells[m*cur_game->cols + i] == -1) {
+                        cur_game->cells[m*cur_game->cols + i] = cur_game->cells[m*cur_game->cols + n];
+                        cur_game->cells[m*cur_game->cols + n] = -1;
+
+                        alreadyMerged = 0;
+                        lastIndex = i;
+
+                        changeApplied = 1;
+                        break;
+                    }
+
+                    // If it is the same value, hasn't been merged, and was the last item moved (only empty spaces between them), merge into spot
+                    if((cur_game->cells[m*cur_game->cols + i] == cur_game->cells[m*cur_game->cols + n]) && lastIndex == i && (alreadyMerged == 0)) {
+                        cur_game->cells[m*cur_game->cols + i] *= 2;
+                        cur_game->cells[m*cur_game->cols + n] = -1;
+
+                        cur_game->score += cur_game->cells[m*cur_game->cols + i];
+
+                        alreadyMerged = 1;
+                        lastIndex = i;
+
+                        changeApplied = 1;
+                        break;
+                    }
+                }
+
+                // If cell didn't move
+                if(cur_game->cells[m*cur_game->cols + n] != -1) {
+                    lastIndex = n;
+                }
+            }
+        }
+    }
+
+    if(changeApplied) {
+        return 1;
+    } else {
+        return 0;
+    }
 };
 
 int move_d(game * cur_game){ //slide to the right
     //YOUR CODE STARTS HERE
+    //YOUR CODE STARTS HERE
+    int changeApplied = 0;
 
-    return 1;
+    // In each row
+    for(int m = 0; m < cur_game->rows; m++){
+        // Check each col
+        int alreadyMerged = 0; // Shows if "top of stack" (most recent item) was a merge
+        int lastIndex = -1; // Top of stack index (index of most recent item)
+
+        for(int n = cur_game->cols - 1; n >= 0; n--) {
+            // If cell is not empty
+            if(cur_game->cells[m*cur_game->cols + n] != -1) {
+                // Find first empty/mergable cell above it (if it exists)
+                for(int i = cur_game->cols - 1; i >= n; i--) {
+                    // If it is empty, move the number into that spot
+                    if(cur_game->cells[m*cur_game->cols + i] == -1) {
+                        cur_game->cells[m*cur_game->cols + i] = cur_game->cells[m*cur_game->cols + n];
+                        cur_game->cells[m*cur_game->cols + n] = -1;
+
+                        alreadyMerged = 0;
+                        lastIndex = i;
+
+                        changeApplied = 1;
+                        break;
+                    }
+
+                    // If it is the same value, hasn't been merged, and was the last item moved (only empty spaces between them), merge into spot
+                    if((cur_game->cells[m*cur_game->cols + i] == cur_game->cells[m*cur_game->cols + n]) && lastIndex == i && (alreadyMerged == 0)) {
+                        cur_game->cells[m*cur_game->cols + i] *= 2;
+                        cur_game->cells[m*cur_game->cols + n] = -1;
+
+                        cur_game->score += cur_game->cells[m*cur_game->cols + i];
+
+                        alreadyMerged = 1;
+                        lastIndex = i;
+
+                        changeApplied = 1;
+                        break;
+                    }
+                }
+
+                // If cell didn't move
+                if(cur_game->cells[m*cur_game->cols + n] != -1) {
+                    lastIndex = n;
+                }
+            }
+        }
+    }
+
+    if(changeApplied) {
+        return 1;
+    } else {
+        return 0;
+    }
 };
 
 int legal_move_check(game * cur_game)
@@ -98,8 +334,35 @@ int legal_move_check(game * cur_game)
  */
 {
     //YOUR CODE STARTS HERE
+    // Check every cell
+    for(int i = 0; i < cur_game->rows; i++) {
+        for(int j = 0; j < cur_game->cols; j++) {
+            int cellVal = cur_game->cells[i*cur_game->cols + j];
+            // If it is empty, there is a legal move
+            if(cellVal == -1) {
+                return 1;
+            }
 
-    return 1;
+            // If one of immediate neighbors match (up, down, left, right), there is a legal move
+            if((i-1 > 0) && (i-1 < cur_game->rows) && cellVal == cur_game->cells[(i-1)*cur_game->cols + j]) {
+                return 1;
+            }
+
+            if((i+1 > 0) && (i+1 < cur_game->rows) && cellVal == cur_game->cells[(i+1)*cur_game->cols + j]) {
+                return 1;
+            }
+
+            if((j-1 > 0) && (j-1 < cur_game->rows) && cellVal == cur_game->cells[i*cur_game->cols + j -1]) {
+                return 1;
+            }
+
+            if((j+1 > 0) && (j+1 < cur_game->rows) && cellVal == cur_game->cells[i*cur_game->cols + j + 1]) {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
 }
 
 

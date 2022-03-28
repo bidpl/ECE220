@@ -344,19 +344,19 @@ int legal_move_check(game * cur_game)
             }
 
             // If one of immediate neighbors match (up, down, left, right), there is a legal move
-            if((i-1 > 0) && (i-1 < cur_game->rows) && cellVal == cur_game->cells[(i-1)*cur_game->cols + j]) {
+            if((i-1 > 0) && cellVal == cur_game->cells[(i-1)*cur_game->cols + j]) {
                 return 1;
             }
 
-            if((i+1 > 0) && (i+1 < cur_game->rows) && cellVal == cur_game->cells[(i+1)*cur_game->cols + j]) {
+            if((i+1 < cur_game->rows) && cellVal == cur_game->cells[(i+1)*cur_game->cols + j]) {
                 return 1;
             }
 
-            if((j-1 > 0) && (j-1 < cur_game->rows) && cellVal == cur_game->cells[i*cur_game->cols + j -1]) {
+            if((j-1 > 0) && cellVal == cur_game->cells[i*cur_game->cols + j -1]) {
                 return 1;
             }
 
-            if((j+1 > 0) && (j+1 < cur_game->rows) && cellVal == cur_game->cells[i*cur_game->cols + j + 1]) {
+            if((j+1 < cur_game->cols) && cellVal == cur_game->cells[i*cur_game->cols + j + 1]) {
                 return 1;
             }
         }

@@ -17,16 +17,16 @@ test - move_d tiles move correctly: pass
 Grade_test2: Pass
 
 ****** Testing legal_move_check() ******
-test - legal move check: failed to detect end game
-Grade_test6: Failed
+test - legal move check: 
+Grade_test6: Pass
 
 ****** Testing remake_game()*****
 test - remake game: test - rm game rows and cols:   
 Grade_test7: Pass
 
-Failed the nightly test.
+Pass the nightly test!!!
 This nightly test is focusing on compilation error not functionality test.
 This nightly report only tests on the released testcases.
 There are many hidden edge testcase for the MP. Please test it yourselve.
 HIGHLY RECOMMEND YOU TO START YOUR MP EARLY!!!!!!!
-Timestamp: 2022-03-28_00:21:25
+Timestamp: 2022-03-29_00:22:07

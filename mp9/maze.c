@@ -2,7 +2,13 @@
 #include <stdlib.h>
 #include "maze.h"
 
-// 
+/* Recursive Maze Solver - MP9 UIUC ECE220 SP22 bmn4
+ *
+ * I filled out all the functions, just did a lot of safety checking cause James told me people wouldn't :P
+ * (yes, checked if file opened, malloc worked, and sscanf worked on file that is already formatted, along with some other stuff)
+ * The safety checks don't really do anything since I didn't edit main.c to check for the safety checks here going off
+ * 
+ */
 
 
 /*
@@ -71,6 +77,8 @@ maze_t * createMaze(char * fileName)
             maze->cells[i][j] = buff[j];
 
             // Check for start/end and legal characters
+            // If start/end, set corresponding coordinates
+            // If invalid, return NULL (not required by project)
             if(buff[j] == START) {
                 maze->startRow = i;
                 maze->startColumn = j;

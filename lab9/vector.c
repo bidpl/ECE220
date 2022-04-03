@@ -4,12 +4,12 @@
 
 vector_t * createVector(int initialSize)
 {
-    vector_t *vector = malloc(sizeof(vector));
+    vector_t *vector = malloc(sizeof(vector_t));
 
     vector->size = 0;
     vector->maxSize = initialSize;
 
-    vector->array = calloc(initialSize, sizeof(int));
+    vector->array = malloc(initialSize * sizeof(int));
 
     return vector;
 }
@@ -22,7 +22,7 @@ void destroyVector(vector_t * vector)
 
 void resize(vector_t * vector)
 {
-    vector->array = realloc(vector->array, vector->maxSize * 2);
+    vector->array = realloc(vector->array, vector->maxSize * 2 * sizeof(int));
     vector->maxSize *= 2;
 }
 

@@ -7,6 +7,8 @@
  * 
  * void deleteNextNode(sp_tuples_node* node);
  * // Takes a node in a linked lists and deletes the next node from the list
+ * 
+ * I took 2 hours fixing this thing cause I wrote = instead of == in gv_tuples I want to die
  */
 
 #define buffLen 100
@@ -110,8 +112,24 @@ sp_tuples * load_tuples(char* input_file)
 
 
 double gv_tuples(sp_tuples * mat_t,int row,int col)
-
 {
+    // Walk through liked list
+    sp_tuples_node *currentNode = mat_t->tuples_head;
+    while(currentNode != NULL) {
+        // If node's coordinates match, return its value
+        if((currentNode->row == row) && (currentNode->col == col)) {
+            return currentNode->value;
+        }
+
+        // If stepped past where the node should be, return 0
+        if((currentNode->row > row) || ((currentNode->row) == row && (currentNode->col > col))) {
+            return 0;
+        }
+
+        currentNode = currentNode->next;
+    }
+
+    // Catch any edge cases (all 0s, etc)
     return 0;
 }
 
@@ -230,9 +248,39 @@ void save_tuples(char * file_name, sp_tuples * mat_t)
 
 
 sp_tuples * add_tuples(sp_tuples * matA, sp_tuples * matB){
+    // Create new sp_tuples
+    sp_tuples *retmat = (sp_tuples*) malloc(sizeof(sp_tuples));
+    retmat->m = matA->m;
+    retmat->n = matA->n;
+    retmat->nz = 0;
+    retmat->tuples_head = NULL;
 
-    return NULL;
-	// return retmat;
+    // Walk through matA and add to retmat
+    sp_tuples_node *currentNode = matA->tuples_head;
+    while(currentNode != NULL) {
+        // Copy values of matA to retmat (retmat is all 0s so adding is same as copying values over)
+        set_tuples(retmat, currentNode->row, currentNode->col, currentNode->value);
+
+        // Step to next node
+        currentNode = currentNode->next;
+    }
+
+    // Walk through matB and add to retmat
+    double retmatVal;
+
+    currentNode = matB->tuples_head;
+    while(currentNode != NULL) {
+        // retmatVal = 0;
+        retmatVal = gv_tuples(retmat, currentNode->row, currentNode->col);
+
+        // Add current value from matB to corresponding node in retmat
+        set_tuples(retmat, currentNode->row, currentNode->col, currentNode->value + retmatVal);
+
+        // Step to next node
+        currentNode = currentNode->next;
+    }
+
+	return retmat;
 }
 
 
@@ -265,9 +313,3 @@ void destroy_tuples(sp_tuples * mat_t){
 
     return;
 }  
-
-
-
-
-
-

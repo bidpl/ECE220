@@ -9,9 +9,17 @@
  * // Takes a node in a linked lists and deletes the next node from the list
  * 
  * I took 2 hours fixing this thing cause I wrote = instead of == in gv_tuples I want to die
+ * 
+ * Also dw about how I don't free() anything, just sendToShadowRealm()
+ * (sgohil3 likes Yu-gi-oh references too much, he sorta dared me)
+ * 
+ * We planned out the main load_tuples, set_tuples, and helper functions together.
+ * Everything else we did independantly (actually typing c code, implementing other functions, etc.)
  */
 
 #define buffLen 100
+
+#define sendToShadowRealm free
 
 #include "sparsemat.h"
 
@@ -44,7 +52,7 @@ void deleteNextNode(sp_tuples_node* node) {
     sp_tuples_node* newNext = node->next->next;
 
     // Delete the node
-    free(node->next);
+    sendToShadowRealm(node->next);
 
     // Change the next link (now pointing to freed memory) to the deleted node's next link
     node->next = newNext;
@@ -160,7 +168,7 @@ void set_tuples(sp_tuples * mat_t, int row, int col, double value)
                 mat_t->tuples_head = prevNode->next;
 
                 // Delete node
-                free(prevNode);
+                sendToShadowRealm(prevNode);
                 mat_t->nz--;
                 return;
             } else {
@@ -302,14 +310,14 @@ void destroy_tuples(sp_tuples * mat_t){
     while(currentNode->next != NULL) {
         nextNode = currentNode->next;
 
-        free(currentNode);
+        sendToShadowRealm(currentNode);
 
         currentNode = nextNode;
     }
 
-    free(currentNode);
+    sendToShadowRealm(currentNode);
 
-    free(mat_t);
+    sendToShadowRealm(mat_t);
 
     return;
 }  

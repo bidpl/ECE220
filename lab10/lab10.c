@@ -18,13 +18,42 @@ void printList(node * Node) {
 }
 
 /*Implement this function for Lab 10*/
-void reverse(node** head){
+node* rev_rec(node* currentNode) {
+    // Base Case (end of linkedlist, return current node)
+    if(currentNode->next == NULL) {
+        return currentNode;
+    }
 
+    // Recursive Case (flip rest of list, reverse current link, return pointer to last)
+    node *newHead = rev_rec(currentNode->next);
+    
+    // Flip the link
+    currentNode->next->next = currentNode;
+    currentNode->next = NULL;
+
+    // Return pointer to last item (new head)
+    return newHead;
+}
+
+void reverse(node** head){
+    // Reverse list and set new head (old last item)
+
+    *head = rev_rec(*head);
 }
 
 /*Implement this function for Lab 10*/
 void removeDuplicates(node* head){
+    while(head->next != NULL) {
+        if(head->next->data == head->data) {
+            node *newNext = head->next->next;
 
+            free(head->next);
+
+            head->next = newNext;
+        } else {
+            head = head->next;
+        }
+    }
 }
 
 int main() {

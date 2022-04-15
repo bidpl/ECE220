@@ -8,13 +8,14 @@
  * void deleteNextNode(sp_tuples_node* node);
  * // Takes a node in a linked lists and deletes the next node from the list
  * 
+ * Also implemented multiply
+ * 
  * I took 2 hours fixing this thing cause I wrote = instead of == in gv_tuples I want to die
  * 
  * Also dw about how I don't free() anything, just sendToShadowRealm()
  * (sgohil3 likes Yu-gi-oh references too much, he sorta dared me)
  * 
  * We planned out the main load_tuples, set_tuples, and helper functions together.
- * Everything else we did independantly (actually typing c code, implementing other functions, etc.)
  */
 
 #define buffLen 100
@@ -294,9 +295,35 @@ sp_tuples * add_tuples(sp_tuples * matA, sp_tuples * matB){
 
 
 sp_tuples * mult_tuples(sp_tuples * matA, sp_tuples * matB){ 
+    sp_tuples* matC = (sp_tuples*) malloc(sizeof(sp_tuples));
+
+    matC->m = matA->m;
+    matC->n = matB->n;
+    matC->nz = 0;
+    matC->tuples_head = NULL;
+
+    // Walk through matA's non-zero entries
+    sp_tuples_node *currentNode = matA->tuples_head;
+    while(currentNode != NULL) {
+        sp_tuples_node *currBNode = matB->tuples_head;
+        while(currBNode != NULL) {
+            if(currBNode->row == currentNode->col) {
+                double currentCVal = gv_tuples(matC, currentNode->row, currBNode->col);
+
+                currentCVal += currentNode->value * currBNode->value;
+
+                set_tuples(matC, currentNode->row, currBNode->col, currentCVal);
+            }
+
+            //Step to next node in matB
+            currBNode = currBNode->next;
+        }
+
+        // Step to next node
+        currentNode = currentNode->next;
+    }
     
-    return NULL;
-    // return retmat;
+    return matC;
 }
 
 

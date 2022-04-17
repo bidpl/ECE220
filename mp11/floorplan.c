@@ -56,6 +56,17 @@ void floorplan(const char file[]) {
 // Return 1 if the given slicing tree node is a leave node, and 0 otherwise.
 int is_leaf_node(node_t* ptr) {
   // TODO: (remember to modify the return value appropriately)
+
+  // null check
+  if(ptr == NULL) {
+    return 0;
+  }
+
+  // Return true if no children
+  if(ptr->left == NULL && ptr->right == NULL) {
+    return 1;
+  }
+
   return 0;
 }
 
@@ -63,6 +74,16 @@ int is_leaf_node(node_t* ptr) {
 // Return 1 if the given slicing tree node is an internal node, and 0 otherwise.
 int is_internal_node(node_t* ptr) {
   // TODO: (remember to modify the return value appropriately)
+  // null check
+  if(ptr == NULL) {
+    return 0;
+  }
+
+  // Return true if there is at least one child
+  if( !(ptr->left == NULL && ptr->right == NULL) ) {
+    return 1;
+  }
+
   return 0;
 }
 

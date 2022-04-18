@@ -1,3 +1,11 @@
+/**
+ * Floorplan - MP11 UIUC ECE220 SP22 bmn4
+ * 
+ * I just implemented the methods, didn't do much extra. 
+ * One thing I did was mess with the makefile while debugging because there's no -g flag
+ * 
+ */
+
 #include "floorplan.h"
 
 // Global variables. The global variables will be effectice after the input has been parsed
@@ -91,6 +99,17 @@ int is_internal_node(node_t* ptr) {
 // Return 1 if the given subtree rooted at node 'b' resides in the subtree rooted at node 'a'.
 int is_in_subtree(node_t* a, node_t* b) {
   // TODO: (remember to modify the return value appropriately)
+  
+  // Null Check
+  if(a == NULL || b == NULL){
+    return 0;
+  }
+
+  // Depth first seach in: preorder (root left right)
+  if(a == b || is_in_subtree(a->left, b) || is_in_subtree(a->right, b)) {
+    return 1;
+  }
+
   return 0;
 }
 
@@ -99,6 +118,16 @@ int is_in_subtree(node_t* a, node_t* b) {
 // and the width of the modules are swapped.
 void rotate(node_t* ptr) {
   // TODO: 
+
+  // Null check + leaf node check
+  if(ptr == NULL || !(is_leaf_node(ptr))) {
+    return;
+  }
+
+  // Swap height + wid
+  int temp = ptr->module->h;
+  ptr->module->h = ptr->module->w;
+  ptr->module->w = temp;
 }
 
 // Procedure: recut
@@ -110,6 +139,12 @@ void recut(node_t* ptr) {
   assert(ptr->module == NULL && ptr->cutline != UNDEFINED_CUTLINE);
 
   // TODO:
+  if(ptr->cutline == V) {
+    ptr->cutline = H;
+  } else {
+    ptr->cutline = V;
+  }
+
   return;
 }
 
@@ -121,6 +156,9 @@ void swap_module(node_t* a, node_t* b) {
   assert(b->module != NULL && b->cutline == UNDEFINED_CUTLINE);
 
   // TODO:
+  module_t* tempModule = a->module;
+  a->module = b->module;
+  b->module = tempModule;
 }
 
 // Procedure: swap_topology
@@ -134,6 +172,25 @@ void swap_topology(node_t* a, node_t* b) {
   assert(a->parent != NULL && b->parent != NULL);
  
   // TODO:
+
+  // Swap A and B's parent's link to them
+  if(a->parent->left == a) {
+    a->parent->left = b;
+  } else {
+    a->parent->right = b;
+  }
+
+  if(b->parent->left == b) {
+    b->parent->left = a;
+  } else {
+    b->parent->right = a;
+  }
+
+  // Swap A and B's link to parents
+  node_t* aParent = a->parent;
+
+  a->parent = b->parent;
+  b->parent = aParent;
 }
 
 // Procedure: get_expression
@@ -169,6 +226,20 @@ void postfix_traversal(node_t* ptr, int* nth, expression_unit_t* expression) {
   if(ptr == NULL) return;
 
   // TODO:
+  // Recurse on left then right, then do root stuff (postfix order)
+  postfix_traversal(ptr->left, nth, expression);
+  postfix_traversal(ptr->right, nth, expression);
+  
+  // On root, add the node to expression
+  if(ptr->module != NULL) {
+    expression[*nth].module = ptr->module;
+    expression[*nth].cutline = UNDEFINED_CUTLINE;
+    (*nth)++;
+  } else {
+    expression[*nth].module = NULL;
+    expression[*nth].cutline = ptr->cutline;
+    (*nth)++;
+  }
 }
 
 // get_total_resource
@@ -177,7 +248,18 @@ int get_total_resource(node_t* ptr)
 {
   // TODO:
 
-  return 0;
+  // NULL Check
+  if(ptr == NULL) {
+    return 0;
+  }
+
+  // If it's a cut module, sum of resources is sum of children's total resources
+  if(ptr->module == NULL) {
+    return get_total_resource(ptr->left) + get_total_resource(ptr->right);
+  }
+
+  // If node contains a module, add that on
+  return get_total_resource(ptr->left) + get_total_resource(ptr->right) + ptr->module->resource;
 }
 
 // Procedure: init_slicing_tree
@@ -208,10 +290,79 @@ int get_total_resource(node_t* ptr)
 // module pointer of the leave node should point to.
 //
 node_t* init_slicing_tree(node_t* par, int n) {
-  
+
   assert(n >= 0 && n < num_modules);
 
   // TODO:
+
+  // Some edge cases
+  // 0 modules
+  if(num_modules == 0) {
+    return NULL;
+  }
+
+  // 1 module
+  if(num_modules == 1) {
+    // Create single node containing module
+    node_t* singleNode = (node_t*) malloc(sizeof(node_t));
+    singleNode->parent = NULL;
+    singleNode->cutline = UNDEFINED_CUTLINE;
+    singleNode->module = modules;
+    
+    // Return the single node tree
+    return singleNode;
+  }
+  // End edge cases
+
+  // If root node (2 or more modules in list)
+  if(par == NULL) {
+    // Create Root node
+    node_t* rootNode = (node_t*) malloc(sizeof(node_t));
+    rootNode->parent = NULL;
+    rootNode->cutline = V;
+    rootNode->module = NULL;
+
+    // Call recursive case
+    init_slicing_tree(rootNode, n);
+
+    // Return tree (root node)
+    return rootNode;
+  }
+
+  // Base case (last module)
+  if(n == num_modules-1) {
+    // Overwrite left cut node as last module
+    par->cutline = UNDEFINED_CUTLINE;
+    par->module = modules + n;
+    par->right = NULL;
+    par->left = NULL;
+
+    return NULL;
+  }
+  
+  
+  // Recrusive Case
+
+  // Make left node (the cut)
+  node_t* cutNode = (node_t*) malloc(sizeof(node_t));
+  cutNode->parent = par;
+  cutNode->cutline = V;
+  cutNode->module = NULL;
+  par->left = cutNode; // Assign it as left child of parent
+
+  // Make right node (module)
+  node_t* moduleNode = (node_t*) malloc(sizeof(node_t));
+  moduleNode->parent = par;
+  moduleNode->cutline = UNDEFINED_CUTLINE;
+  moduleNode->module = modules + n;
+  moduleNode->left = NULL;
+  moduleNode->right = NULL;
+
+  par->right = moduleNode; // Assign it as right child of parent
+
+  // Recurse
+  init_slicing_tree(cutNode, n+1);
+
   return NULL;
 }
 

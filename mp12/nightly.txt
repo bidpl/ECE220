@@ -16,9 +16,9 @@ Your total Score for MP12: 100/100
 
 
 
-Failed the nightly test.
+Pass the nightly test!!!
 This nightly test is focusing on compilation error not functionality test.
 This nightly report only tests on the released testcases.
 There are many hidden edge testcase for the MP. Please test it yourselve.
 HIGHLY RECOMMEND YOU TO START YOUR MP EARLY!!!!!!!
-Timestamp: 2022-04-25_00:22:12
+Timestamp: 2022-05-03_00:26:28
